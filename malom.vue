@@ -29,9 +29,8 @@
     div.O {
         margin: 4px auto;
         border-radius: 18px;
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
+        width: 22px;
+        height: 22px;
     }
     div.Empty {
         width: 20px;
@@ -45,6 +44,9 @@
         background-color: rgb(69, 28, 194);
         box-shadow: 0px 0px 5px black;
     }
+    div.K {
+        cursor: pointer;
+    }
 </style>
 
 <template>
@@ -54,10 +56,25 @@
         <table style="margin: 0 auto;">
             <tr :key="y" v-for="(row,y) in table">
                 <td :key="x" v-for="(cell,x) in row" :class="'d'+cell">
-                    <div class="Empty" v-if="cell=='0'" />
-                    <div class="O R" v-if="cell=='R' || szin(x,y,'R')" />
-                    <div class="O B" v-if="cell=='B' || szin(x,y,'B')" />
-                    <div class="O" v-if="!remm && count<18 && szin(x,y,'0')" @click="katt(x,y)" />
+                    <span v-if="!remm">
+                        <div class="Empty" v-if="cell=='0'" />
+                        <div class="O R" v-if="cell=='R' || szin(x,y,'R')" />
+                        <div class="O B" v-if="cell=='B' || szin(x,y,'B')" />
+                        <div class="O K" v-if="count<18 && szin(x,y,'0')" @click="katt(x,y)" />
+                    </span>
+                    <span v-if="remm=='R'">
+                        <div class="Empty" v-if="cell=='0'" />
+                        <div class="O R" v-if="cell=='R' || szin(x,y,'R')" />
+                        <div class="O B K" v-if="cell=='B' || szin(x,y,'B')" @click="del(x,y,'B')" />
+                        <div class="O" v-if="count<18 && szin(x,y,'0')" />
+                    </span>
+                    <span v-if="remm=='B'">
+                        <div class="Empty" v-if="cell=='0'" />
+                        <div class="O R K" v-if="cell=='R' || szin(x,y,'R')" @click="del(x,y,'R')"/>
+                        <div class="O B" v-if="cell=='B' || szin(x,y,'B')" />
+                        <div class="O" v-if="count<18 && szin(x,y,'0')" />
+                    </span>
+
                     <span v-if="cell=='2'">
                         |
                     </span>
@@ -124,12 +141,12 @@ export default {
             if (nx>6 && ny==6) ny++ 
             if (this.next=='R') {
                 toadd=this.Rf
-                if (++this.RRC[ny] === 3) this.remm=true
-                if (++this.RCC[nx] === 3) this.remm=true
+                if (++this.RRC[ny] === 3) this.remm=this.next
+                if (++this.RCC[nx] === 3) this.remm=this.next
             } else {
                 toadd=this.Bf
-                if (++this.BRC[ny] === 3) this.remm=true
-                if (++this.BCC[nx] === 3) this.remm=true
+                if (++this.BRC[ny] === 3) this.remm=this.next
+                if (++this.BCC[nx] === 3) this.remm=this.next
             }
             toadd.add(`${x}-${y}`)            
             if (this.next=='B')
@@ -137,6 +154,29 @@ export default {
             else 
                 this.$set(this.table[14],Math.round(this.count++/2),0)
             this.next=this.next=='R'?'B':'R'
+        },
+        del(x,y,szin) {
+            let toadd, nx=x, ny=y
+            if (nx==6 && ny>6) nx++  
+            if (nx>6 && ny==6) ny++ 
+            if (szin=='R') {
+                toadd=this.Rf
+                --this.RRC[ny] 
+                --this.RCC[nx] 
+            } else {
+                toadd=this.Bf
+                --this.BRC[ny] 
+                --this.BCC[nx]
+            }
+            toadd.delete(`${x}-${y}`)
+            /*
+            if (szin=='B')
+                this.$set(this.table[15],12-Math.round(this.count--/2-0.5),szin)
+            else 
+                this.$set(this.table[14],Math.round(this.count--/2),szin)
+                */
+            //this.next=this.next=='R'?'B':'R'
+            this.remm=false
         },
         uj() {
             this.table[14] = ['R','R','R','R','R','R','R','R','R',0,0,0,0]
