@@ -57,7 +57,7 @@
                     <div class="Empty" v-if="cell=='0'" />
                     <div class="O R" v-if="cell=='R' || szin(x,y,'R')" />
                     <div class="O B" v-if="cell=='B' || szin(x,y,'B')" />
-                    <div class="O" v-if="count<18 && szin(x,y,'0')" @click="katt(x,y)" />
+                    <div class="O" v-if="!remm && count<18 && szin(x,y,'0')" @click="katt(x,y)" />
                     <span v-if="cell=='2'">
                         |
                     </span>
@@ -94,7 +94,12 @@ export default {
         Rf: new Set,
         Bf: new Set,
         next: 'R',
-        count: 0
+        count: 0,
+        BRC: Array(14).fill(0),
+        BCC: Array(14).fill(0),
+        RRC: Array(14).fill(0),
+        RCC: Array(14).fill(0),
+        remm: false
     }),
     methods: {
         szin(x,y,szin) {
@@ -112,9 +117,18 @@ export default {
             }           
         },
         katt(x,y) {
-            let toadd
-            if (this.next=='R') toadd=this.Rf
-            else toadd=this.Bf
+            let toadd, nx=x, ny=y 
+            if (nx>5 && ny>5) ( nx++, ny++)
+            if (this.next=='R') {
+                toadd=this.Rf
+                if (++this.RRC[ny] === 3) this.remm=true
+                if (++this.RCC[nx] === 3) this.remm=true
+
+            } else {
+                toadd=this.Bf
+                if (++this.BRC[ny] === 3) this.remm=true
+                if (++this.BCC[nx] === 3) this.remm=true
+            }
             toadd.add(`${x}-${y}`)            
             if (this.next=='B')
                 this.$set(this.table[15],12-this.count++/2+0.5,0)
