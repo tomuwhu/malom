@@ -67,6 +67,8 @@
                 </td>
             </tr>
         </table>
+        <br>
+        <button @click="uj()">Új játék</button>
     </div>
 </template>
  
@@ -91,14 +93,14 @@ export default {
                 ['R','R','R','R','R','R','R','R','R',0,0,0,0],
                 [0,0,0,0,'B','B','B','B','B','B','B','B','B'],
         ],
-        Rf: new Set,
-        Bf: new Set,
-        next: 'R',
-        count: 0,
-        BRC: Array(14).fill(0),
-        BCC: Array(14).fill(0),
-        RRC: Array(14).fill(0),
-        RCC: Array(14).fill(0),
+        Rf: null,
+        Bf: null,
+        next: null,
+        count: null,
+        BRC: null,
+        BCC: null,
+        RRC: null,
+        RCC: null,
         remm: false
     }),
     methods: {
@@ -117,13 +119,13 @@ export default {
             }           
         },
         katt(x,y) {
-            let toadd, nx=x, ny=y 
-            if (nx>5 && ny>5) ( nx++, ny++)
+            let toadd, nx=x, ny=y
+            if (nx==6 && ny>6) nx++  
+            if (nx>6 && ny==6) ny++ 
             if (this.next=='R') {
                 toadd=this.Rf
                 if (++this.RRC[ny] === 3) this.remm=true
                 if (++this.RCC[nx] === 3) this.remm=true
-
             } else {
                 toadd=this.Bf
                 if (++this.BRC[ny] === 3) this.remm=true
@@ -131,11 +133,27 @@ export default {
             }
             toadd.add(`${x}-${y}`)            
             if (this.next=='B')
-                this.$set(this.table[15],12-this.count++/2+0.5,0)
+                this.$set(this.table[15],12-Math.round(this.count++/2-0.5),0)
             else 
-                this.$set(this.table[14],this.count++/2,0)
+                this.$set(this.table[14],Math.round(this.count++/2),0)
             this.next=this.next=='R'?'B':'R'
+        },
+        uj() {
+            this.table[14] = ['R','R','R','R','R','R','R','R','R',0,0,0,0]
+            this.table[15] = [0,0,0,0,'B','B','B','B','B','B','B','B','B']
+            this.BRC = Array(14).fill(0),
+            this.BCC = Array(14).fill(0),
+            this.RRC = Array(14).fill(0),
+            this.RCC = Array(14).fill(0),
+            this.count=0
+            this.Rf=new Set
+            this.Bf=new Set
+            this.remm = false
+            this.next='R'
         }
+    },
+    beforeMount() {
+        this.uj()
     }
 }
 </script>
