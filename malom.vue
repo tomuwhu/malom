@@ -169,14 +169,13 @@ export default {
                 --this.BCC[nx]
             }
             toadd.delete(`${x}-${y}`)
-            /*
             if (szin=='B')
                 this.$set(this.table[15],12-Math.round(this.count--/2-0.5),szin)
             else 
                 this.$set(this.table[14],Math.round(this.count--/2),szin)
-                */
             //this.next=this.next=='R'?'B':'R'
             this.remm=false
+            if (this.count>=18) this.remm='m'+this.next
         },
         uj() {
             this.table[14] = ['R','R','R','R','R','R','R','R','R',0,0,0,0]
